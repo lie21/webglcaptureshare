@@ -65,7 +65,7 @@
         frameworkUrl: buildUrl + "/captureshare.framework.js.unityweb",
         codeUrl: buildUrl + "/captureshare.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
+        companyName: "Alittlebytes",
         productName: "Screenshoot and Share WebGL",
         productVersion: "0.1",
         showBanner: unityShowBanner,
@@ -128,6 +128,8 @@
       var files;
       var photoname = "PhotoName";
       var photoCaption = "Beatiful Image";
+
+      //Take screenshot using html2canvas and save data to blob
       function TakeShotJs() {
           let div = document.body;
           html2canvas(div, {
@@ -136,28 +138,19 @@
               useCORS: true
           }).then(
               function (canvas) {
-              canvas.toBlob(function (blob) {
-                link.href = URL.createObjectURL(blob);
-                console.log(blob);
-                myBlob = blob;
+                  canvas.toBlob(function (blob) {
+                      link.href = URL.createObjectURL(blob);
+                      console.log(blob);
+                      myBlob = blob;
+                  }, 'image/png');
+                  canvas.style.width = "100%";
+                  canvas.style.height = "100%";
 
-                //Creating an actual File
-                const file = new File([myBlob], 'image.png', {
-                  type: myBlob.type,
-                });
-
-                files = [file];
-                console.log(files);
-
-              }, 'image/png');
-              canvas.style.width = "100%";
-              canvas.style.height = "100%";
-
-              photo.appendChild(canvas);
-              //photo.style.display = "block";                  
-            })
+                  photo.appendChild(canvas);
+                })
       }
 
+      //Download image
       function downloadImage() {
           console.log(link.href);
           link.download = photoname;
@@ -166,7 +159,7 @@
           link.dispatchEvent(event);
           window.URL.revokeObjectURL(link.href);
       }
-
+      
       function closePreview() {
           photo.style.display = "none";
           if (photo.hasChildNodes()) {
@@ -175,19 +168,28 @@
       }
 
       async function shareMedia() {
+          //Creating an actual File
+          const file = new File([myBlob], photoname + '.png', {
+            type: myBlob.type,
+          });
+
+          files = [file];
+          console.log(files);
+          
+          //check file existension
           if (files.length === 0) {
             console.log("No files selected.");
             return;
           }
+
+          //check webshare API compability
           console.log("Try to share");
-            // feature detecting navigator.canShare() also implies
-            // the same for the navigator.share()
             if (!navigator.canShare) {
-              //output.textContent = `Your browser doesn't support the Web Share API.`;
               console.log("Your browser doesn't support the Web Share API.");
               return;
             }
 
+            //insert file properties and share
             if (navigator.canShare({ files })) {
               try {
                 await navigator.share({
@@ -195,14 +197,11 @@
                   title: photoname,
                   text: photoCaption,
                 });
-                //output.textContent = "Shared!";
                 console.log("shared");
               } catch (error) {
-                //output.textContent = `Error: ${error.message}`;
                 console.log(`Error: ${error.message}`);
               }
             } else {
-              //output.textContent = `Your system doesn't support sharing these files.`;
               console.log("Your system doesn't support sharing these files.");
             }
           }
