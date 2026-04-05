@@ -136,25 +136,26 @@
               useCORS: true
           }).then(
               function (canvas) {
-                  canvas.toBlob(function (blob) {
-                      link.href = URL.createObjectURL(blob);
-                      console.log(blob);
-                      myBlob = blob;
-                  }, 'image/png');
-                  canvas.style.width = "100%";
-                  canvas.style.height = "100%";
+              canvas.toBlob(function (blob) {
+                link.href = URL.createObjectURL(blob);
+                console.log(blob);
+                myBlob = blob;
 
-                  photo.appendChild(canvas);
-                  //photo.style.display = "block";
+                //Creating an actual File
+                const file = new File([myBlob], 'image.png', {
+                  type: myBlob.type,
+                });
 
-                  //Creating an actual File
-                  const file = new File([myBlob], photoname +'.png', {
-                    type: myBlob.type,
-                  });
+                files = [file];
+                console.log(files);
 
-                  files = [file];
-                  console.log(files);
-                })
+              }, 'image/png');
+              canvas.style.width = "100%";
+              canvas.style.height = "100%";
+
+              photo.appendChild(canvas);
+              //photo.style.display = "block";                  
+            })
       }
 
       function downloadImage() {
